@@ -12,13 +12,14 @@ typedef struct Node
 PNODE creat_list(void);
 void traverse_list(PNODE pHead);
 bool is_empty(PNODE pHead);
-int insert_list(PNODE);
+bool insert_list(PNODE pHead, int pos, int val);
 int lenght_list(PNODE pHead);
-bool delete_list(PNODE);
-void sort_list(PNODE);
+bool delete_list(PNODE pHead, int pos, int *val);
+void sort_list(PNODE pHead);
 
 int main()
 {
+    int val;
     PNODE pHead = NULL;
     pHead = creat_list(); //创建一个非循环单链表，并将该链表的头节点的地址返回
     traverse_list(pHead); //遍历链表
@@ -29,6 +30,16 @@ int main()
     //     printf("链表不为空！！！\n");
 
     // printf("链表的长度为：%d", lenght_list(pHead));//求链表的长度
+
+    // sort_list(pHead);     //升序链表
+    // traverse_list(pHead); //遍历链表
+
+    // insert_list(pHead, 3, 52);
+    // traverse_list(pHead);
+
+    delete_list(pHead, 4, &val);
+    traverse_list(pHead);
+
     return 0;
 }
 
@@ -100,4 +111,79 @@ int lenght_list(PNODE pHead)
         p = p->pNext;
     }
     return cnt;
+}
+
+void sort_list(PNODE pHead)
+{
+    PNODE p, q; //声明两个PNODE类型的指针来操作链表
+    int i, j, temp;
+    for (i = 0, p = pHead->pNext; i < lenght_list(pHead) - 1; ++i, p = p->pNext)
+    {
+        for (j = i + 1, q = p->pNext; j < lenght_list(pHead); ++j, q = q->pNext)
+        {
+            if (p->data > q->data)
+            {
+                temp = p->data;
+                p->data = q->data;
+                q->data = temp;
+            }
+        }
+    }
+    return;
+}
+
+bool insert_list(PNODE pHead, int pos, int val)
+{
+    PNODE p = pHead;
+    int i = 0;
+    while (i < pos - 1 && p->pNext != NULL)
+    {
+        p = p->pNext;
+        ++i;
+    }
+    if (p->pNext == NULL || i > pos - 1)
+    {
+        return false;
+        exit(-1);
+    }
+
+    // p指针已经指向了要插入节点前一个的位置
+    PNODE pNew = (PNODE)malloc(sizeof(PNODE));
+    if (NULL == pNew)
+    {
+        printf("动态开辟内存失败！！！/n");
+        exit(-1);
+    }
+
+    //将创建的节点进行insert操作
+    pNew->data = val;
+    PNODE ptemp = p->pNext; //用于存储后一个节点
+    p->pNext = pNew;
+    pNew->pNext = ptemp;
+    return true;
+}
+
+bool delete_list(PNODE pHead, int pos, int *val)
+{
+    PNODE p = pHead;
+    int i = 0;
+    while (i < pos - 1 && p->pNext != NULL)
+    {
+        p = p->pNext;
+        ++i;
+    }
+    if (p->pNext == NULL || i > pos - 1)
+    {
+        return false;
+        exit(-1);
+    }
+
+    // p指针已经指向了要删除节点的前一个的位置
+    PNODE ptemp = p->pNext; //保存要删除节点
+    *val = ptemp->data;     //将删除节点的值保存
+    p->pNext = ptemp->pNext;
+    free(ptemp);
+    ptemp = NULL;
+
+    return true;
 }
